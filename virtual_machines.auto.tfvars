@@ -4,9 +4,12 @@ virtual_machines = {
     memory_minimum_mb = 1024
     memory_maximum_mb = 2048
     runcmd = [
+      # Enable HA
       "systemctl enable --now haproxy",
       "systemctl enable --now keepalived",
+      # Wait for balooning ram to initialize
       "while [ $(free -m | awk '/^Mem:/{print $2}') -lt 1700 ]; do echo \"Waiting for RAM to initialize...\"; sleep 2; done",
+# Bootstrap cluster
       "/usr/bin/kubeadm init --skip-token-print --skip-certificate-key-print --upload-certs --token $KUBERNETES_TOKEN --certificate-key $KUBERNETES_CERTIFICATE_KEY --control-plane-endpoint 172.16.3.10:8443"
     ]
   }
