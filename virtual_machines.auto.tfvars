@@ -32,6 +32,8 @@ virtual_machines = {
   "host04" = {
     ip = "172.16.3.14"
     runcmd = [
+      "systemctl disable --now haproxy",
+      "systemctl disable --now keepalived",
       "while [ $(free -m | awk '/^Mem:/{print $2}') -lt 1700 ]; do echo \"Waiting for RAM to initialize...\"; sleep 2; done",
       "/usr/bin/kubeadm join --discovery-token-unsafe-skip-ca-verification --token $KUBERNETES_TOKEN 172.16.3.10:8443"
     ]
@@ -39,6 +41,8 @@ virtual_machines = {
   "host05" = {
     ip = "172.16.3.15"
     runcmd = [
+      "systemctl disable --now haproxy",
+      "systemctl disable --now keepalived",
       "while [ $(free -m | awk '/^Mem:/{print $2}') -lt 1700 ]; do echo \"Waiting for RAM to initialize...\"; sleep 2; done",
       "/usr/bin/kubeadm join --discovery-token-unsafe-skip-ca-verification --token $KUBERNETES_TOKEN 172.16.3.10:8443"
     ]
