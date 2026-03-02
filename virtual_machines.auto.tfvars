@@ -1,8 +1,6 @@
 virtual_machines = {
   "host01" = {
-    ip                = "172.16.3.11"
-    memory_minimum_mb = 1024
-    memory_maximum_mb = 2048
+    ip = "172.16.3.11"
     runcmd = [
       # Enable HA
       "systemctl enable --now haproxy",
@@ -14,9 +12,7 @@ virtual_machines = {
     ]
   }
   "host02" = {
-    ip                = "172.16.3.12"
-    memory_minimum_mb = 1024
-    memory_maximum_mb = 2048
+    ip = "172.16.3.12"
     runcmd = [
       "systemctl enable --now haproxy",
       "systemctl enable --now keepalived",
@@ -25,9 +21,7 @@ virtual_machines = {
     ]
   }
   "host03" = {
-    ip                = "172.16.3.13"
-    memory_minimum_mb = 1024
-    memory_maximum_mb = 2048
+    ip = "172.16.3.13"
     runcmd = [
       "systemctl enable --now haproxy",
       "systemctl enable --now keepalived",
