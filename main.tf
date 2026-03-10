@@ -22,12 +22,15 @@ locals {
   env_vars = {
     "KUBERNETES_TOKEN"           = local.bws_secrets["kubernetes-token"]
     "KUBERNETES_CERTIFICATE_KEY" = local.bws_secrets["kubernetes-certificate-key"]
+    "CSI_PROXMOX_TOKEN_ID"       = local.bws_secrets["proxmox-csi-api-token-id"]
+    "CSI_PROXMOX_TOKEN_SECRET"   = local.bws_secrets["proxmox-csi-api-token-secret"]
   }
 
   nodes = {
     for hostname, config in var.virtual_machines : hostname => {
       name              = hostname
       ip                = config.ip
+      vmid              = config.vmid
       memory_maximum_mb = config.memory_maximum_mb
       memory_minimum_mb = config.memory_minimum_mb
       user_password     = local.bws_secrets["vm-${hostname}-user-password"]
@@ -105,13 +108,19 @@ resource "proxmox_virtual_environment_vm" "node" {
   for_each  = local.nodes
   node_name = var.proxmox_node_name
   name      = each.key
+  vm_id     = each.value.vmid
+
+  smbios {
+    serial = "h=pve;i=${each.value.vmid}"
+  }
+
   memory {
     dedicated = tonumber("${each.value.memory_maximum_mb}")
     floating  = tonumber("${each.value.memory_minimum_mb}")
   }
 
   clone {
-    vm_id = 101
+    vm_id = 103
     full  = false
   }
 

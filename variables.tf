@@ -37,6 +37,7 @@ variable "virtual_machines" {
     memory_maximum_mb = optional(number, 4096)
     memory_minimum_mb = optional(number, 2048)
     runcmd            = list(string)
+    vmid              = number
   }))
 }
 
