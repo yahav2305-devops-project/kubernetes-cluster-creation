@@ -129,3 +129,32 @@ resource "proxmox_virtual_environment_vm" "node" {
     network_data_file_id = proxmox_virtual_environment_file.network_data_cloud_config[each.value.name].id
   }
 }
+
+resource "null_resource" "k8s_cleanup" {
+  triggers = {
+    private_key = sensitive(local.bws_secrets["vm-host01-user-ssh-private-key"])
+    host        = var.virtual_machines["host01"].ip
+    password    = sensitive(local.bws_secrets["vm-host01-user-password"])
+  }
+
+  depends_on = [
+    proxmox_virtual_environment_vm.node
+  ]
+
+  provisioner "remote-exec" {
+    when = destroy
+
+    connection {
+      type        = "ssh"
+      user        = "user"
+      private_key = self.triggers.private_key
+      host        = self.triggers.host
+      script_path = "/home/user/terraform_%RAND%.sh"
+    }
+
+    inline = [
+      "chmod +x /home/user/cleanup.sh",
+      "echo '${self.triggers.password}' | sudo -S /home/user/cleanup.sh",
+    ]
+  }
+}
