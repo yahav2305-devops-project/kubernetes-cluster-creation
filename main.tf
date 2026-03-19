@@ -22,6 +22,12 @@ locals {
   env_vars = {
     "KUBERNETES_TOKEN"           = local.bws_secrets["kubernetes-token"]
     "KUBERNETES_CERTIFICATE_KEY" = local.bws_secrets["kubernetes-certificate-key"]
+    "SEAWEEDFS_ADMIN_UI_USERNAME" = local.bws_secrets["seaweedfs-admin-ui-username"]
+    "SEAWEEDFS_ADMIN_UI_PASSWORD" = local.bws_secrets["seaweedfs-admin-ui-password"]
+    "SEAWEEDFS_S3_ADMIN_ACCESS_KEY_ID" = local.bws_secrets["seaweedfs-s3-admin-access-key-id"]
+    "SEAWEEDFS_S3_ADMIN_SECRET_ACCESS_KEY" = local.bws_secrets["seaweedfs-s3-admin-secret-access-key"]
+    "SEAWEEDFS_S3_READ_ACCESS_KEY_ID" = local.bws_secrets["seaweedfs-s3-read-access-key-id"]
+    "SEAWEEDFS_S3_READ_SECRET_ACCESS_KEY" = local.bws_secrets["seaweedfs-s3-read-secret-access-key"]
   }
 
   nodes = {

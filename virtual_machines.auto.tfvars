@@ -24,14 +24,21 @@ virtual_machines = {
       # Install CNI
       "helm install cilium oci://quay.io/cilium/charts/cilium --version 1.19.1 --namespace kube-system --values /etc/kubernetes/thirdparty/cilium/values.yaml --wait",
       # Install CSI
-      "bash -c \"kubectl label nodes host0{1..6} topology.kubernetes.io/region=MyCluster\"",
-      "bash -c \"kubectl label nodes host0{1..6} topology.kubernetes.io/zone=pve\"",
-      "kubectl create ns csi",
-      "kubectl label ns csi pod-security.kubernetes.io/enforce=privileged",
-      "bash -c \"kubectl --namespace csi create secret generic proxmox-csi-plugin --from-file=config.yaml=<(envsubst < /etc/kubernetes/thirdparty/proxmox-csi-plugin/config.yaml)\"",
-      "helm install csi-proxmox oci://ghcr.io/sergelogvinov/charts/proxmox-csi-plugin --version 0.5.5 --namespace csi --values /etc/kubernetes/thirdparty/proxmox-csi-plugin/values.yaml --wait",
-      "kubectl annotate storageclass proxmox storageclass.kubernetes.io/is-default-class=true --overwrite"
-      # TODO: Then setup a teardown script to delete the namespaces before deleting the VMs, otherwise the proxmox virtual disks will stay
+      "helm install local-path-provisioner oci://ghcr.io/rancher/local-path-provisioner/charts/local-path-provisioner --version 0.0.35 --create-namespace --namespace local-path-provisioner --values /etc/kubernetes/thirdparty/localpath-csi/values.yaml --wait",
+      "helm repo add seaweedfs https://seaweedfs.github.io/seaweedfs/helm",
+      "helm repo update",
+      "kubectl create ns seaweedfs",
+      "export SEAWEEDFS_ADMIN_UI_USERNAME_BASE64=$(echo -n \"$SEAWEEDFS_ADMIN_UI_USERNAME\" | base64)",
+      "export SEAWEEDFS_ADMIN_UI_PASSWORD_BASE64=$(echo -n \"$SEAWEEDFS_ADMIN_UI_PASSWORD\" | base64)",
+      "envsubst < /etc/kubernetes/thirdparty/seaweedfs/admin-ui-credentials.yaml | kubectl apply -f -",
+      "export SEAWEEDFS_S3_ADMIN_ACCESS_KEY_ID_BASE64=$(echo -n \"$SEAWEEDFS_S3_ADMIN_ACCESS_KEY_ID\" | base64)",
+      "export SEAWEEDFS_S3_ADMIN_SECRET_ACCESS_KEY_BASE64=$(echo -n \"$SEAWEEDFS_S3_ADMIN_SECRET_ACCESS_KEY\" | base64)",
+      "export SEAWEEDFS_S3_READ_ACCESS_KEY_ID_BASE64=$(echo -n \"$SEAWEEDFS_S3_READ_ACCESS_KEY_ID\" | base64)",
+      "export SEAWEEDFS_S3_READ_SECRET_ACCESS_KEY_BASE64=$(echo -n \"$SEAWEEDFS_S3_READ_SECRET_ACCESS_KEY\" | base64)",
+      "export SEAWEEDFS_S3_CONFIG_BASE64=$(jq -cn --arg admin_access_key_id \"$SEAWEEDFS_S3_ADMIN_ACCESS_KEY_ID\" --arg admin_secret_access_key \"$SEAWEEDFS_S3_ADMIN_SECRET_ACCESS_KEY\" --arg read_access_key_id \"$SEAWEEDFS_S3_READ_ACCESS_KEY_ID\" --arg read_secret_access_key \"$SEAWEEDFS_S3_READ_SECRET_ACCESS_KEY\" '{\"identities\":[{\"name\":\"anvAdmin\",\"credentials\":[{\"accessKey\":$admin_access_key_id,\"secretKey\":$admin_secret_access_key}],\"actions\":[\"Admin\",\"Read\",\"Write\"]},{\"name\":\"anvReadOnly\",\"credentials\":[{\"accessKey\":$read_access_key_id,\"secretKey\":$read_secret_access_key}],\"actions\":[\"Read\"]}]}' | base64 -w 0)",
+      "envsubst < /etc/kubernetes/thirdparty/seaweedfs/s3-credentials.yaml | kubectl apply -f -",
+      "helm install seaweedfs seaweedfs/seaweedfs --version 4.17.0 --namespace seaweedfs --values /etc/kubernetes/thirdparty/seaweedfs/values.yaml --wait",
+      "helm install seaweedfs-csi-driver seaweedfs-csi-driver/seaweedfs-csi-driver --version 0.2.11 --namespace seaweedfs --values /etc/kubernetes/thirdparty/seaweedfs-csi-driver/values.yaml --wait"
     ]
   }
   "host02" = {
