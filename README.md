@@ -18,7 +18,7 @@ terraform validate
 ```
 Run the code:
 ```sh
-terraform apply -auto-approve \
+terraform apply -auto-approve -parallelism=2 \
     -replace="terraform_data.fetch_kubeconfig" \
     -replace="proxmox_virtual_environment_vm.node[\"host01\"]" \
     -replace="proxmox_virtual_environment_vm.node[\"host02\"]" \
