@@ -1,13 +1,19 @@
-variable "bws_token" {
+variable "bws_organization_id" {
   type        = string
   sensitive   = true
-  description = "API token for bitwarden secret manager authentication"
+  description = "UUID of the bitwarden secret manager organization to list secrets from"
 }
 
 variable "bws_project_id" {
   type        = string
   sensitive   = true
   description = "UUID of the bitwarden secret manager project to list secrets from"
+}
+
+variable "bws_token" {
+  type        = string
+  sensitive   = true
+  description = "API token for bitwarden secret manager authentication"
 }
 
 variable "proxmox_ssh_username" {

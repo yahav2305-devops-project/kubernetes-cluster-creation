@@ -28,22 +28,34 @@ virtual_machines = {
       "kubectl apply -f /etc/kubernetes/thirdparty/prometheus/prometheus.yaml --server-side=true",
       # Install CNI
       "helm install cilium oci://quay.io/cilium/charts/cilium --version 1.19.1 --namespace kube-system --values /etc/kubernetes/thirdparty/cilium/values.yaml --wait",
-      # Install CSI
-      "helm install local-path-provisioner oci://ghcr.io/rancher/local-path-provisioner/charts/local-path-provisioner --version 0.0.35 --create-namespace --namespace local-path-provisioner --values /etc/kubernetes/thirdparty/localpath-csi/values.yaml --wait",
-      "helm repo add seaweedfs https://seaweedfs.github.io/seaweedfs/helm",
+      # # Install CSI
+      # TODO: Move this to using installing using ArgoCD
+      # "helm install local-path-provisioner oci://ghcr.io/rancher/local-path-provisioner/charts/local-path-provisioner --version 0.0.35 --create-namespace --namespace local-path-provisioner --values /etc/kubernetes/thirdparty/localpath-csi/values.yaml --wait",
+      # "helm repo add seaweedfs https://seaweedfs.github.io/seaweedfs/helm",
+      # "helm repo update",
+      # "kubectl create ns seaweedfs",
+      # "export SEAWEEDFS_ADMIN_UI_USERNAME_BASE64=$(echo -n \"$SEAWEEDFS_ADMIN_UI_USERNAME\" | base64)",
+      # "export SEAWEEDFS_ADMIN_UI_PASSWORD_BASE64=$(echo -n \"$SEAWEEDFS_ADMIN_UI_PASSWORD\" | base64)",
+      # "envsubst < /etc/kubernetes/thirdparty/seaweedfs/admin-ui-credentials.yaml | kubectl apply -f -",
+      # "export SEAWEEDFS_S3_ADMIN_ACCESS_KEY_ID_BASE64=$(echo -n \"$SEAWEEDFS_S3_ADMIN_ACCESS_KEY_ID\" | base64)",
+      # "export SEAWEEDFS_S3_ADMIN_SECRET_ACCESS_KEY_BASE64=$(echo -n \"$SEAWEEDFS_S3_ADMIN_SECRET_ACCESS_KEY\" | base64)",
+      # "export SEAWEEDFS_S3_READ_ACCESS_KEY_ID_BASE64=$(echo -n \"$SEAWEEDFS_S3_READ_ACCESS_KEY_ID\" | base64)",
+      # "export SEAWEEDFS_S3_READ_SECRET_ACCESS_KEY_BASE64=$(echo -n \"$SEAWEEDFS_S3_READ_SECRET_ACCESS_KEY\" | base64)",
+      # "export SEAWEEDFS_S3_CONFIG_BASE64=$(jq -cn --arg admin_access_key_id \"$SEAWEEDFS_S3_ADMIN_ACCESS_KEY_ID\" --arg admin_secret_access_key \"$SEAWEEDFS_S3_ADMIN_SECRET_ACCESS_KEY\" --arg read_access_key_id \"$SEAWEEDFS_S3_READ_ACCESS_KEY_ID\" --arg read_secret_access_key \"$SEAWEEDFS_S3_READ_SECRET_ACCESS_KEY\" '{\"identities\":[{\"name\":\"anvAdmin\",\"credentials\":[{\"accessKey\":$admin_access_key_id,\"secretKey\":$admin_secret_access_key}],\"actions\":[\"Admin\",\"Read\",\"Write\"]},{\"name\":\"anvReadOnly\",\"credentials\":[{\"accessKey\":$read_access_key_id,\"secretKey\":$read_secret_access_key}],\"actions\":[\"Read\"]}]}' | base64 -w 0)",
+      # "envsubst < /etc/kubernetes/thirdparty/seaweedfs/s3-credentials.yaml | kubectl apply -f -",
+      # "helm install seaweedfs seaweedfs/seaweedfs --version 4.17.0 --namespace seaweedfs --values /etc/kubernetes/thirdparty/seaweedfs/values.yaml --wait",
+      # "helm install seaweedfs-csi-driver seaweedfs-csi-driver/seaweedfs-csi-driver --version 0.2.11 --namespace seaweedfs --values /etc/kubernetes/thirdparty/seaweedfs-csi-driver/values.yaml --wait",
+      # Install cert-manager
+      "helm install cert-manager oci://quay.io/jetstack/charts/cert-manager --version v1.20.1 --namespace cert-manager --create-namespace --values /etc/kubernetes/thirdparty/cert-manager/values.yaml --verify --keyring /etc/kubernetes/thirdparty/cert-manager/cert-manager-keyring.gpg --wait",
+      # Install External Secret Operator
+      "kubectl create ns external-secrets",
+      "kubectl apply -f /etc/kubernetes/thirdparty/external-secrets-operator/certificate-resources.yaml",
+      "kubectl create secret generic bitwarden-access-token --namespace external-secrets --from-literal=token=$BITWARDEN_TOKEN",
+      "helm repo add external-secrets https://charts.external-secrets.io",
       "helm repo update",
-      "kubectl create ns seaweedfs",
-      "export SEAWEEDFS_ADMIN_UI_USERNAME_BASE64=$(echo -n \"$SEAWEEDFS_ADMIN_UI_USERNAME\" | base64)",
-      "export SEAWEEDFS_ADMIN_UI_PASSWORD_BASE64=$(echo -n \"$SEAWEEDFS_ADMIN_UI_PASSWORD\" | base64)",
-      "envsubst < /etc/kubernetes/thirdparty/seaweedfs/admin-ui-credentials.yaml | kubectl apply -f -",
-      "export SEAWEEDFS_S3_ADMIN_ACCESS_KEY_ID_BASE64=$(echo -n \"$SEAWEEDFS_S3_ADMIN_ACCESS_KEY_ID\" | base64)",
-      "export SEAWEEDFS_S3_ADMIN_SECRET_ACCESS_KEY_BASE64=$(echo -n \"$SEAWEEDFS_S3_ADMIN_SECRET_ACCESS_KEY\" | base64)",
-      "export SEAWEEDFS_S3_READ_ACCESS_KEY_ID_BASE64=$(echo -n \"$SEAWEEDFS_S3_READ_ACCESS_KEY_ID\" | base64)",
-      "export SEAWEEDFS_S3_READ_SECRET_ACCESS_KEY_BASE64=$(echo -n \"$SEAWEEDFS_S3_READ_SECRET_ACCESS_KEY\" | base64)",
-      "export SEAWEEDFS_S3_CONFIG_BASE64=$(jq -cn --arg admin_access_key_id \"$SEAWEEDFS_S3_ADMIN_ACCESS_KEY_ID\" --arg admin_secret_access_key \"$SEAWEEDFS_S3_ADMIN_SECRET_ACCESS_KEY\" --arg read_access_key_id \"$SEAWEEDFS_S3_READ_ACCESS_KEY_ID\" --arg read_secret_access_key \"$SEAWEEDFS_S3_READ_SECRET_ACCESS_KEY\" '{\"identities\":[{\"name\":\"anvAdmin\",\"credentials\":[{\"accessKey\":$admin_access_key_id,\"secretKey\":$admin_secret_access_key}],\"actions\":[\"Admin\",\"Read\",\"Write\"]},{\"name\":\"anvReadOnly\",\"credentials\":[{\"accessKey\":$read_access_key_id,\"secretKey\":$read_secret_access_key}],\"actions\":[\"Read\"]}]}' | base64 -w 0)",
-      "envsubst < /etc/kubernetes/thirdparty/seaweedfs/s3-credentials.yaml | kubectl apply -f -",
-      "helm install seaweedfs seaweedfs/seaweedfs --version 4.17.0 --namespace seaweedfs --values /etc/kubernetes/thirdparty/seaweedfs/values.yaml --wait",
-      "helm install seaweedfs-csi-driver seaweedfs-csi-driver/seaweedfs-csi-driver --version 0.2.11 --namespace seaweedfs --values /etc/kubernetes/thirdparty/seaweedfs-csi-driver/values.yaml --wait",
+      "helm install external-secrets external-secrets/external-secrets --version 2.2.0 --namespace external-secrets --create-namespace --values /etc/kubernetes/thirdparty/external-secrets-operator/values.yaml --wait",
+      "export BITWARDEN_CA_TLS_CERT=$(kubectl get secret bitwarden-tls-certs -n external-secrets -o jsonpath='{.data.tls\\.crt}')",
+      "envsubst < /etc/kubernetes/thirdparty/external-secrets-operator/cluster-secret-store.yaml | kubectl apply -f -",
     ]
   }
   "host02" = {
