@@ -56,6 +56,8 @@ virtual_machines = {
       "helm install external-secrets external-secrets/external-secrets --version 2.2.0 --namespace external-secrets --create-namespace --values /etc/kubernetes/thirdparty/external-secrets-operator/values.yaml --wait",
       "export BITWARDEN_CA_TLS_CERT=$(kubectl get secret bitwarden-tls-certs -n external-secrets -o jsonpath='{.data.tls\\.crt}')",
       "envsubst < /etc/kubernetes/thirdparty/external-secrets-operator/cluster-secret-store.yaml | kubectl apply -f -",
+      # Install ArgoCD
+      "helm install argocd oci://ghcr.io/argoproj/argo-helm/argo-cd --version 9.4.17 --namespace argocd --create-namespace --values /etc/kubernetes/thirdparty/argocd/values.yaml --wait",
     ]
   }
   "host02" = {
