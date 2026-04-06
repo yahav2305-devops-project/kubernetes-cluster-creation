@@ -41,6 +41,7 @@ virtual_machines = {
       "envsubst < /etc/kubernetes/thirdparty/external-secrets-operator/cluster-secret-store.yaml | kubectl apply -f -",
       # Install ArgoCD
       "helm install argocd oci://ghcr.io/argoproj/argo-helm/argo-cd --version 9.4.17 --namespace argocd --create-namespace --values /etc/kubernetes/thirdparty/argocd/values.yaml --wait",
+      "kubectl apply -f /etc/kubernetes/thirdparty/argocd/root-app.yaml",
     ]
   }
   "host02" = {
