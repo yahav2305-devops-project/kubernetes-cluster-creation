@@ -138,6 +138,8 @@ resource "terraform_data" "fetch_kubeconfig" {
   depends_on = [proxmox_virtual_environment_vm.node]
 
   provisioner "local-exec" {
+    interpreter = [ "/bin/bash", "-c" ]
+
     environment = {
       "SUDO_PASSWORD" = local.bws_secrets["vm-host01-user-password"]
     }
