@@ -29,6 +29,8 @@ virtual_machines = {
       "kubectl apply -f /etc/kubernetes/thirdparty/prometheus/prometheus.yaml --server-side=true",
       # Install CNI
       "helm install cilium oci://quay.io/cilium/charts/cilium --version 1.19.1 --namespace kube-system --values /etc/kubernetes/thirdparty/cilium/values.yaml --wait",
+      "kubectl apply -f /etc/kubernetes/thirdparty/cilium/CiliumL2AnnouncementPolicy.yaml",
+      "kubectl apply -f /etc/kubernetes/thirdparty/cilium/CiliumLoadBalancerIPPool.yaml",
       # Install cert-manager
       "helm install cert-manager oci://quay.io/jetstack/charts/cert-manager --version v1.20.1 --namespace cert-manager --create-namespace --values /etc/kubernetes/thirdparty/cert-manager/values.yaml --verify --keyring /etc/kubernetes/thirdparty/cert-manager/cert-manager-keyring.gpg --wait",
       # Install External Secret Operator
